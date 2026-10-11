@@ -1,0 +1,33 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isSuperAdmin() {
+      return signedIn() && request.auth.token.email == 'ofobifrimpongk@gmail.com';
+    }
+    function isAdmin() {
+      return isSuperAdmin() || (signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+    }
+    function isOwner(userId) { return signedIn() && request.auth.uid == userId; }
+
+    match /users/{userId} {
+      allow create: if isOwner(userId)
+        && request.resource.data.email == request.auth.token.email
+        && (request.resource.data.role == 'student'
+          || (isSuperAdmin() && request.resource.data.role == 'superAdmin'));
+      allow read: if isOwner(userId) || isSuperAdmin();
+      allow update: if isSuperAdmin() || (isOwner(userId)
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.email == resource.data.email);
+      allow delete: if isSuperAdmin();
+    }
+
+    match /courses/{courseId} {
+      allow read: if signedIn();
+      allow write: if isSuperAdmin() || isAdmin();
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}
