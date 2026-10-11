@@ -1,6 +1,7 @@
 import { getApp, getApps, initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
+import { getDatabase } from 'firebase/database'
 import { getStorage } from 'firebase/storage'
 
 // Copy .env.example to .env.local and fill these values from Firebase.
@@ -8,14 +9,18 @@ import { getStorage } from 'firebase/storage'
 export const firebaseProjectConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 }
 
-const isConfigured = Object.values(firebaseProjectConfig).every(Boolean)
+const requiredConfig = ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId']
+const isConfigured = requiredConfig.every((key) => firebaseProjectConfig[key])
 export const firebaseApp = isConfigured ? (getApps().length ? getApp() : initializeApp(firebaseProjectConfig)) : null
 export const auth = firebaseApp ? getAuth(firebaseApp) : null
 export const db = firebaseApp ? getFirestore(firebaseApp) : null
+export const realtimeDb = firebaseApp ? getDatabase(firebaseApp) : null
 export const storage = firebaseApp ? getStorage(firebaseApp) : null
