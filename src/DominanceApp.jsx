@@ -1,5 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { GoogleAuthProvider, createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, updateProfile } from 'firebase/auth'
+import { collection, doc, getDocs, limit, onSnapshot, query, setDoc } from 'firebase/firestore'
+import { auth, db } from './firebase.js'
 import './foundation.css'
+import './auth.css'
 
 const curriculum = {
   'HB 1': { First: ['Basic Medical Chemistry', 'Biological Chemistry', 'Medical Genetics', 'Cell Structure', 'Ghanaian Sign Language', 'Communication Skills', 'Computer Appreciation', 'Algebra', 'Statistical Methods'], Second: ['Ghanaian Sign Language', 'Medical Entomology', 'Behavioural Science', 'Human Anatomy I', 'Biochemistry I', 'Physiology I'] },
@@ -8,18 +12,42 @@ const curriculum = {
 }
 
 export default function DominanceApp() {
-  const [profile, setProfile] = useState({ name: 'Medical Student', year: 'HB 1', semester: 'First', courses: ['Cell Structure', 'Basic Medical Chemistry'] })
+  const [user, setUser] = useState(null)
+  const [profile, setProfile] = useState(null)
+  const [loading, setLoading] = useState(true)
   const [page, setPage] = useState('home')
   const [course, setCourse] = useState('Cell Structure')
-  const [setup, setSetup] = useState(true)
   const [dark, setDark] = useState(false)
+  useEffect(() => {
+    if (!auth || !db) { setLoading(false); return undefined }
+    let stopProfile = () => {}
+    const stopAuth = onAuthStateChanged(auth, (nextUser) => {
+      stopProfile()
+      setUser(nextUser)
+      if (!nextUser) { setProfile(null); setLoading(false); return }
+      stopProfile = onSnapshot(doc(db, 'users', nextUser.uid), (snapshot) => {
+        setProfile(snapshot.exists() ? { ...snapshot.data(), id: snapshot.id } : null)
+        setLoading(false)
+      })
+    })
+    return () => { stopAuth(); stopProfile() }
+  }, [])
+  if (loading) return <div className="dom-loading">Loading DOMiNANCE…</div>
+  if (!user) return <AuthGate />
+  if (!profile) return <Onboarding profile={{ name: user.displayName || user.email?.split('@')[0] || 'Medical Student', year: 'HB 1', semester: 'First', courses: [] }} save={async (nextProfile) => {
+    const existingProfiles = await getDocs(query(collection(db, 'users'), limit(1)))
+    await setDoc(doc(db, 'users', user.uid), { ...nextProfile, email: user.email, role: existingProfiles.empty ? 'superAdmin' : 'student', createdAt: new Date().toISOString() })
+  }} />
+  const navigation = [['home','⌂','Home'],['courses','▤','Courses'],['desk','✦','Study desk'],['quiz','✓','Quiz'],['cards','▣','Cards']]
+  if (profile.role === 'superAdmin') navigation.push(['admin','⚙','Admin'])
   return <div className={dark ? 'dom-app dark' : 'dom-app'}>
-    <aside className="dom-side"><div className="dom-brand"><b>DM</b><span>DOMiNANCE<small>MEDICAL EDUCATION</small></span></div><nav>{[['home','⌂','Home'],['courses','▤','Courses'],['desk','✦','Study desk'],['quiz','✓','Quiz'],['cards','▣','Cards'],['admin','⚙','Admin']].map(([id,icon,label])=><button onClick={()=>setPage(id)} className={page===id?'active':''}><i>{icon}</i>{label}</button>)}</nav><div className="dom-user"><b>{profile.name}</b><small>{profile.year} · Student</small></div></aside>
+    <aside className="dom-side"><div className="dom-brand"><b>DM</b><span>DOMiNANCE<small>MEDICAL EDUCATION</small></span></div><nav>{navigation.map(([id,icon,label])=><button key={id} onClick={()=>setPage(id)} className={page===id?'active':''}><i>{icon}</i>{label}</button>)}</nav><div className="dom-user"><b>{profile.name}</b><small>{profile.year} · {profile.role === 'superAdmin' ? 'Super Admin' : 'Student'}</small></div></aside>
     <header className="dom-head"><span>DOMiNANCE <b>/ {page === 'home' ? 'Home' : page}</b></span><button onClick={()=>setDark(!dark)}>{dark?'☀ Light':'☾ Dark'}</button></header>
     <main className="dom-main">{page==='home'&&<Home profile={profile} go={setPage} setCourse={setCourse}/>} {page==='courses'&&<CourseList profile={profile} go={setPage} setCourse={setCourse}/>} {page==='desk'&&<Desk course={course}/>} {page==='quiz'&&<Quiz/>} {page==='cards'&&<Cards/>} {page==='admin'&&<Admin/>}</main>
-    {setup&&<Onboarding profile={profile} save={(p)=>{setProfile(p);setSetup(false)}}/>}
   </div>
 }
+
+function AuthGate() { const [mode,setMode]=useState('signin'); const [name,setName]=useState(''); const [email,setEmail]=useState(''); const [password,setPassword]=useState(''); const [error,setError]=useState(''); const [busy,setBusy]=useState(false); const submit=async(e)=>{e.preventDefault();setError('');setBusy(true);try{if(!auth)throw new Error('Firebase is not configured.');if(mode==='signup'){const result=await createUserWithEmailAndPassword(auth,email,password);if(name.trim()) await updateProfile(result.user,{displayName:name.trim()})}else await signInWithEmailAndPassword(auth,email,password)}catch(err){setError(err.message.replace('Firebase: ',''))}finally{setBusy(false)}};const google=async()=>{setError('');setBusy(true);try{if(!auth)throw new Error('Firebase is not configured.');await signInWithPopup(auth,new GoogleAuthProvider())}catch(err){setError(err.message.replace('Firebase: ',''))}finally{setBusy(false)}};return <div className="dom-auth"><section><div className="dom-auth-brand"><b>DM</b><span>DOMiNANCE<small>MEDICAL EDUCATION</small></span></div><p className="dom-kicker">YOUR MEDICAL STUDY SPACE</p><h1>{mode==='signin'?'Welcome back':'Start your DOMiNANCE'}</h1><p>Everything you need for focused learning, revision, and clinical confidence.</p><form onSubmit={submit}>{mode==='signup'&&<label>Full name<input required value={name} onChange={e=>setName(e.target.value)} placeholder="Your name"/></label>}<label>Email<input required type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com"/></label><label>Password<input required type="password" minLength="6" value={password} onChange={e=>setPassword(e.target.value)} placeholder="At least 6 characters"/></label>{error&&<p className="dom-auth-error">{error}</p>}<button className="dom-primary" disabled={busy}>{busy?'Please wait…':mode==='signin'?'Sign in':'Create free account'}</button></form><div className="dom-auth-divider">or</div><button className="dom-google" onClick={google} disabled={busy}>G &nbsp; Continue with Google</button><p className="dom-auth-switch">{mode==='signin'?'New to DOMiNANCE?':'Already have an account?'} <button onClick={()=>{setMode(mode==='signin'?'signup':'signin');setError('')}}>{mode==='signin'?'Create an account':'Sign in'}</button></p></section></div> }
 
 function Home({profile,go,setCourse}) { return <section className="dom-page"><p className="dom-kicker">YOUR STUDY SPACE</p><h1>Welcome back, {profile.name}</h1><p className="dom-muted">One focused session today brings you closer to confident practice.</p><div className="dom-years">{Object.keys(curriculum).map(y=><button className={profile.year===y?'current':''}>{y}{y==='HB 3'&&<small>Coming soon</small>}</button>)}</div><section className="dom-continue"><div><p className="dom-kicker">CONTINUE WHERE YOU LEFT OFF</p><h2>Cell membrane transport</h2><p>Cell Structure · Topic breakdown · 42% complete</p><button onClick={()=>{setCourse('Cell Structure');go('desk')}}>Resume session →</button></div><b>01</b></section><div className="dom-actions"><button onClick={()=>go('desk')}><span>✦</span><b>Ask AI</b><small>Study a slide with AI</small></button><button onClick={()=>go('cards')}><span>▣</span><b>Flashcards</b><small>Recall the essentials</small></button><button onClick={()=>go('quiz')}><span>✓</span><b>Quiz</b><small>Test understanding</small></button></div><h2 className="dom-section-title">My courses</h2><div className="dom-course-grid">{profile.courses.map((c,i)=><button className="dom-course" onClick={()=>{setCourse(c);go('desk')}}><span>{i?'⚗️':'🧬'}</span><b>{c}</b><small>{i?'Start learning':'42% complete'}</small></button>)}</div></section> }
 function CourseList({profile,go,setCourse}) { const [year,setYear]=useState(profile.year),[semester,setSemester]=useState(profile.semester); const list=curriculum[year][semester]; return <section className="dom-page"><p className="dom-kicker">CURRICULUM</p><h1>Explore your courses</h1><div className="dom-filters">{Object.keys(curriculum).map(y=><button className={year===y?'current':''} onClick={()=>setYear(y)}>{y}</button>)}<select value={semester} onChange={e=>setSemester(e.target.value)}><option>First</option><option>Second</option></select></div>{year==='HB 3'?<div className="dom-empty"><span>✦</span><h2>HB3 is coming soon</h2><p>We are preparing the next level of your DOMiNANCE journey.</p></div>:<div className="dom-course-grid">{list.map((c,i)=><button className="dom-course" onClick={()=>{setCourse(c);go('desk')}}><span>{['🧬','⚗️','🫀','🧠','🦴'][i%5]}</span><b>{c}</b><small>Open study materials →</small></button>)}</div>}</section> }
