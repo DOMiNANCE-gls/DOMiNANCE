@@ -1,0 +1,7 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {firebaseConfiguration} from '../src/firebase-mode.js';
+test('emulator mode ignores real environment values',()=>{const {emulator,config}=firebaseConfiguration({DEV:true,MODE:'emulator',VITE_FIREBASE_PROJECT_ID:'dominance-d310e',VITE_FIREBASE_API_KEY:'must-not-use',VITE_FIREBASE_DATABASE_URL:'https://must-not-use.invalid'});assert.equal(emulator,true);assert.equal(config.projectId,'demo-dominance');assert.equal(config.apiKey,'demo-only-key');assert.equal(config.databaseURL,undefined)});
+test('emulator flag cannot enable emulators outside dedicated development mode',()=>{assert.throws(()=>firebaseConfiguration({DEV:false,MODE:'emulator'}));assert.throws(()=>firebaseConfiguration({DEV:true,MODE:'development',VITE_USE_FIREBASE_EMULATORS:'true'}));assert.throws(()=>firebaseConfiguration({DEV:false,MODE:'production',VITE_USE_FIREBASE_EMULATORS:'true'}))});
+test('ordinary configuration remains unchanged',()=>{const result=firebaseConfiguration({MODE:'production',DEV:false,VITE_FIREBASE_PROJECT_ID:'ordinary-value'});assert.equal(result.emulator,false);assert.equal(result.config.projectId,'ordinary-value')});
+
+import {accountError} from '../src/account-session.js';
+test('older and newer credential errors share helpful non-identifying feedback',()=>{for(const code of ['auth/wrong-password','auth/user-not-found','auth/invalid-credential'])assert.equal(accountError({code}),'The email or password is incorrect.')});

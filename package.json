@@ -7,7 +7,11 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dev:emulator": "vite --mode emulator",
+    "emulators": "node scripts/start-emulators.mjs",
+    "test": "node --test tests/*.test.js tests/*.test.cjs",
+    "test:emulators": "node --test tests/emulator.integration.js"
   },
   "dependencies": {
     "firebase": "^13.0.0",
@@ -19,6 +23,8 @@
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
     "@vitejs/plugin-react": "^4.3.4",
+    "firebase-tools": "^15.33.0",
+    "oxlint": "^1.88.0",
     "tailwindcss": "^4.3.3",
     "vite": "^5.4.19"
   }
