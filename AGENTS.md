@@ -62,7 +62,7 @@ DOMiNANCE helps Ghanaian HB1–HB3 medical students study, recall, and apply the
 ## Current milestone and academic context
 
 - Account reliability stages 1A, 1B and 1C are implemented locally and manually accepted, including the visible quiz-answer fix. Keep authenticated parent identity, private account-owned persistence, profile editing and existing theme/quiz behaviour intact.
-- Phase 1 Home & Profile Experience Refinement is the current approved milestone; existing Home and five-tab foundations are retained. Primary destinations are Home, My Courses, Practice, Community and My Progress, with responsive browsing navigation. Profile/settings remains in the avatar menu. Focused quiz exits use the accessible in-app confirmation.
+- Phase 1 Home & Profile Experience Refinement is complete and accepted; existing Home and five-tab foundations are retained. Primary destinations are Home, My Courses, Practice, Community and My Progress, with responsive browsing navigation. Profile/settings remains in the avatar menu. Focused quiz exits use the accessible in-app confirmation.
 - Browsing history stores presentation only. Validate course/topic context against the authenticated student's academic policy; never authorize using hashes/history state, URL parameters or browser storage.
 - Do not silently migrate legacy browser records. New demo records are private personal activity, not official assessment scores or mastery. Pending sync remains memory-only: communicate errors/retry and do not claim complete offline support.
 - Preserve featured-course selection; do not automatically assign compulsory courses. Automatic curriculum assignment is a later separately approved milestone.
@@ -81,3 +81,9 @@ DOMiNANCE helps Ghanaian HB1–HB3 medical students study, recall, and apply the
 - Profile picture picker supports bundled preset portraits and initials saved as validated private dashboardState.avatar identifiers. Never store external avatar URLs or image blobs there. Temporary photo previews overlay the saved selection and must clear on account switching; removing a preview restores that account's saved preset/initials. Cancel never persists a draft selection.
 
 - Medical-study SVG wallpaper is shared across browsing tabs, inherits theme colours and visual intensity, and remains noninteractive. Calm and forced colours hide it. Focused quizzes, study/reading contexts and LAMLA use quieter backgrounds. No caduceus is included. Preserve consistent themes in account panels while keeping forms readable.
+
+## Phase 2 authorization — 2026-10-14
+
+The user approved adapting the Cell Structure kit to this existing DOMiNANCE/Firebase repository, committing Phase 1 and working on a separate feature branch with a draft PR. This supersedes the earlier Phase 1 stop/no-content/no-commit restrictions for this pilot only. Do not switch to Supabase, change repositories, merge or deploy. Keep production Firebase configuration and rules unchanged. The Phase 1 checkpoint is 89d982a on pj/student-experience-foundation. Keep the Phase 2 PR based on that branch for a focused review.
+
+Academic content remains a review candidate: 46 lessons and 170 supplied questions, unchanged originals in content/cell-structure. Recompile with npm run content:cell. Strip internal QA/provenance from the student asset; do not publish source slide images. No generated replacement academic material or mastery claims. Private cellStructure state is personal review activity, not authoritative assessment data. Academic approval by the user and review by Ofobi are merge gates.
