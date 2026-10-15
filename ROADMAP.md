@@ -1,12 +1,36 @@
 # DOMiNANCE roadmap
 
-Updated 2026-10-14. Status describes local implementation separately from live-service verification. Existing uncommitted work is preserved; nothing has been committed or deployed.
+Updated 2026-10-15. Current status below supersedes historical milestone entries. Phase 1 is checkpointed at 89d982a; Phase 2 is on codex/hb1-cell-structure-content in Draft PR #1, based on pj/student-experience-foundation. No merge or deployment.
+
+## Current verified state — stabilization and course/practice architecture
+
+- Five primary tabs remain: Home, My Courses, Practice, Community, My Progress. Home/Profile remain intact. Account reliability 1A–1C and Phase 1 were manually accepted.
+- Every available course opens Study Blocks, Summaries and LAMLA. Cell Structure Study Blocks contains seven blocks, 46 numbered lessons and one-section-at-a-time reading. Other courses have honest unavailable destinations.
+- Practice independently opens Topic Questions, Past Questions, Flashcards and Mock Exams. Only Topic Questions has content: the 170 supplied Cell Structure MCQs. Other destinations are Coming Soon; no invented papers, decks or exam formats.
+- Section reading supports contents, Previous/Next, explicit read markers, 51 revealable checks, source disclosures and approximate account-owned section resume. Focused reading/quiz hides primary navigation but retains clear exits and the account header.
+- Practice supports actual-pool five/ten/all counts, stable shuffled choices, changeable answers, Previous/Next, jump/status, review before submission, unanswered marking, explanations, history and retry. Existing drafts resume without replacement.
+- Signup/onboarding no longer has a course/favourites picker. Existing course preferences remain intact; curriculum visibility follows year/semester eligibility. No new compulsory assignment implemented.
+- Theme Studio previews are scoped to its miniature. Explicit Save acknowledges an atomic owner-profile write before applying globally. Failure preserves the draft for retry. Cancel/close discards unsaved preview.
+- Reproduced theme leakage and 42px sync-induced layout movement are fixed. Remaining claims and before/after evidence are in docs/STABILIZATION_REPORT.md.
+- All 92 educational components reviewed: 50 effective, 34 useful but unclear, 4 questionable and 4 exact duplicates. Formatting applied; four exact repeated connections link to their shared original. Substantive academic revisions await approval. All original lesson Markdown and MCQ JSON remain unchanged.
+- Verification: 100 automated tests and one real local Auth/Firestore integration scenario pass; lint has eight existing legacy warnings and zero errors; build passes with the existing bundle-size warning. Desktop/390px journeys checked. Physical-device touch, screen-reader audit, complete source reconciliation and question-by-question certification remain outstanding.
+
+## Next approval gates and planned work
+
+1. User/Ofobi review of this Draft PR and the academic proposals in docs/EDUCATIONAL_REVIEW.md. No automatic merge or deployment.
+2. Approve and prepare seven block summaries separately; Slide Essentials are not approved block summaries.
+3. Define and academically review LAMLA (Last-Minute Learning Association), verified past papers, flashcards and mock assessment rules before implementing content/workflows.
+4. Future curriculum catalogue maintenance and compulsory-course personalization remain separate from eligibility visibility. Handbook 2024 needs current lecturer-outline verification.
+5. Community, Weekly Revision, Speed Race, Mistake Bank and an actual source-grounded assistant remain planned; no fabricated activity or working integration claims.
+6. Resolve pilot capacity/offline/concurrent-draft limitations before wider release. Protect licensed content and authoritative assessments server-side if introduced.
+
+Historical entries below record what was true at each earlier milestone; later verified status above takes precedence.
 
 ## Product direction
 
 Build an understandable, trustworthy medical study space for Ghanaian KNUST students. Preserve DOMiNANCE branding, its clean typographic DOMiNANCE wordmark (lowercase i, no caduceus or decorative D), blue-and-gold default and existing slogans. Keep phone use, keyboard access and readable themes central.
 
-Application functionality and foundations come first. HB1 is the first eventual academic-content priority because materials exist for both semesters. Academic preparation is a parallel workflow, potentially coordinated by Ofobi with team support; ownership and review procedures still need agreement. No extraction, question generation or uploads are underway.
+Application functionality and foundations come first. HB1 is the first eventual academic-content priority because materials exist for both semesters. Academic preparation is a parallel workflow, potentially coordinated by Ofobi with team support; ownership and review procedures still need agreement. Cell Structure supplied materials are now a versioned review candidate; no automatic question generation or resource uploads are implemented.
 
 The SMS Handbook 2024 provides curriculum context. Verify current lecturer outlines before treating it as 2026/27 course content. HB2 has paired semester course codes despite annual student navigation; HB3 has five core course groups. Preserve codes and source editions in a future maintained curriculum catalogue rather than rewriting screens. Handbook title/credit inconsistencies require verification. Clinical years remain future scope.
 
@@ -18,7 +42,7 @@ Stage 1C: the parent bootstraps the dashboard from authenticated UID and loaded 
 
 Target: incremental consolidation into one React application, shared stable course/topic/content models, trusted identity and routes, reviewed resources, then cloud progress. Preserve existing records during migrations.
 
-## Implemented locally before this milestone
+## Historical baseline before account milestones
 
 - Four primary tabs: Home, My courses, Practice and My progress, with mobile navigation.
 - Practice groups quizzes, flashcards and LAMLA. Flashcards is explicitly coming soon; LAMLA remains a Home shortcut. Topic assistant identifies itself as a disconnected preview.

@@ -1,5 +1,7 @@
 # Cell Structure pilot integration
 
+**Current implementation (2026-10-15):** see [STABILIZATION_REPORT.md](STABILIZATION_REPORT.md) for the section-by-section reader, three course/four Practice destinations, new review/submission flow and verified results. Earlier continuous-reading and Check-answer descriptions below are historical and superseded. Academic source assets remain unchanged.
+
 This feature adapts the supplied kit to DOMiNANCE-gls/DOMiNANCE and Firebase. The kit's original Supabase/dominance-learn deployment instructions do not apply. Phase 1 was checkpointed as 89d982a on pj/student-experience-foundation; the separate pilot branch is codex/hb1-cell-structure-content. No merge or deployment is authorized.
 
 ## Content and import

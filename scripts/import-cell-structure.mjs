@@ -15,7 +15,7 @@ export function validateContent(data){
 }
 export function compile(){
  const rank=id=>id.startsWith('lesson_')?0:({CO:1,OR:2,CM:3,CY:4,CE:5,BI:6}[id.slice(0,2)]??9);
- const lessons=readdirSync(path.join(source,'lessons')).filter(f=>/^[\w]+\.md$/.test(f)).map(file=>{const raw=readFileSync(path.join(source,'lessons',file),'utf8');return{id:file.slice(0,-3),title:raw.match(/^#\s+(.+)/m)?.[1],markdown:studentMarkdown(raw)}}).sort((a,b)=>rank(a.id)-rank(b.id)||a.id.localeCompare(b.id));
+ const lessons=readdirSync(path.join(source,'lessons')).filter(f=>/^[\w]+\.md$/.test(f)).map(file=>{const raw=readFileSync(path.join(source,'lessons',file),'utf8');return{id:file.slice(0,-3),title:raw.match(/^#\s+(.+)/m)?.[1],markdown:studentMarkdown(raw).replace(/\((?:PDF\s+)?pp?\.\s*\d+(?:[–-]\d+)?(?:,\s*\d+(?:[–-]\d+)?)?\)/g,'').replace(/the clarification above/g,'the clarification in this lesson').replace(/specific sequence and times above/g,'specific sequence and times in this lesson').replace('### Understanding Note — Urate oxidase and human peroxisomes\n',''),references:[...new Set(raw.match(/\((?:PDF\s+)?pp?\.\s*\d+(?:[–-]\d+)?(?:,\s*\d+(?:[–-]\d+)?)?\)/g)||[])],attribution:raw.match(/^\*\*Source:\*\*\s*(.*?)(?:\*\*Status:|$)/m)?.[1]?.trim()||'Supplied Cell Structure teaching material'}}).sort((a,b)=>rank(a.id)-rank(b.id)||a.id.localeCompare(b.id));
  const questions=JSON.parse(readFileSync(path.join(source,'MCQ_170_REVIEW_READY.json'),'utf8')).map(({id,lesson,question,options,letter,explanation})=>({id,lesson,question,options,letter,explanation}));
  return validateContent({version:1,status:'academic-review-pending',course:'Cell Structure',scope:'HB1:First',lessons,questions});
 }
