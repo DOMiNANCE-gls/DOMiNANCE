@@ -1,3 +1,4 @@
+import '../public/dashboard/cell-learning.js'
 import '../public/dashboard/cell-index.js'
 import '../public/dashboard/cell-state.js'
 import {validAvatar} from './avatars.js'

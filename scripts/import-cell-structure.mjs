@@ -1,3 +1,4 @@
+import '../public/dashboard/cell-learning.js';
 import {readFileSync,readdirSync,writeFileSync,mkdirSync} from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -5,7 +6,7 @@ const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const source=path.join(root,'content/cell-structure');
 export function studentMarkdown(text){
  const lines=text.replace(/\r\n/g,'\n').split('\n');let skipping=false,depth=0;
- return lines.filter(line=>{const heading=line.match(/^(#{1,6})\s+(.+)/);if(heading){if(/internal|source and review note/i.test(heading[2])){skipping=true;depth=heading[1].length;return false}if(skipping&&heading[1].length<=depth)skipping=false}return !skipping&&!/^\*\*(Source|Status):\*\*/i.test(line)}).join('\n').trim();
+ return lines.filter(line=>{const heading=line.match(/^(#{1,6})\s+(.+)/);if(heading){if(/internal|source and review note/i.test(heading[2])){skipping=true;depth=heading[1].length;return false}if(skipping&&heading[1].length<=depth)skipping=false}return !skipping&&!/^\*\*(Source|Status|Figure placements|Student-facing lessons):?\*\*/i.test(line)&&!/^#{1,6}\s+(?:DOMiNANCE.*Cell Structure|Milestone \d+.*Student-facing editorial draft)/.test(line)&&!/^\*\*Student-facing lessons/.test(line)}).join('\n').trim();
 }
 export function validateContent(data){
  if(data.lessons.length!==46||data.questions.length!==170)throw Error('Expected 46 lessons and 170 questions');
